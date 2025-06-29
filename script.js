@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let categories = [];
     let tempSeasons = null;
     
-    // Carregar arquivo JSON (corrigido)
+    // Carregar arquivo JSON
     loadBtn.addEventListener('click', function() {
         const file = jsonFileInput.files[0];
         if (!file) {
@@ -55,49 +55,26 @@ document.addEventListener('DOMContentLoaded', function() {
         reader.onload = function(e) {
             try {
                 const parsedData = JSON.parse(e.target.result);
-                
-                // Verificar se o JSON tem a estrutura esperada
                 if (!Array.isArray(parsedData)) {
-                    throw new Error('O arquivo JSON deve conter um array de animes.');
+                    throw new Error("O arquivo JSON deve conter um array de animes");
                 }
-                
-                // Validar cada anime
-                parsedData.forEach(anime => {
-                    if (!anime.id || !anime.title || !anime.type) {
-                        throw new Error('Cada anime deve ter pelo menos id, title e type definidos.');
-                    }
-                    
-                    // Garantir que cada anime tenha seasons (mesmo que vazio)
-                    if (!anime.seasons) {
-                        anime.seasons = [];
-                    }
-                    
-                    // Garantir que cada temporada tenha episodes (mesmo que vazio)
-                    anime.seasons.forEach(season => {
-                        if (!season.episodes) {
-                            season.episodes = [];
-                        }
-                    });
-                });
                 
                 animeData = parsedData;
                 updateAnimeList();
                 updateJsonOutput();
                 alert('Arquivo carregado com sucesso!');
             } catch (error) {
-                alert('Erro ao carregar o arquivo: ' + error.message);
+                alert('Erro ao analisar o arquivo JSON: ' + error.message);
                 console.error(error);
             }
         };
-        
         reader.onerror = function() {
-            alert('Erro ao ler o arquivo. Por favor, tente novamente.');
+            alert('Erro ao ler o arquivo.');
         };
-        
         reader.readAsText(file);
     });
     
-    // Adicionar novo anime (com temporada e episódio padrão)
+    // Adicionar novo anime
     addAnimeBtn.addEventListener('click', function() {
         resetForm();
         currentAnimeIndex = -1;
@@ -110,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const today = new Date().toISOString().split('T')[0];
         animeDateAdded.value = today;
         
-        // Criar temporada e episódio padrão
+        // Adicionar uma temporada e episódio padrão ao novo anime
         tempSeasons = [{
             number: 1,
             episodes: [{
@@ -120,12 +97,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }]
         }];
         
-        // Atualizar listas para mostrar os dados padrão
+        // Atualizar a lista de temporadas
         updateSeasonList();
-        if (tempSeasons.length > 0) {
-            seasonSelect.selectedIndex = 0;
-            seasonSelect.dispatchEvent(new Event('change'));
-        }
+        seasonSelect.selectedIndex = 0;
+        seasonSelect.dispatchEvent(new Event('change'));
     });
     
     // Selecionar anime
@@ -163,22 +138,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Adicionar temporada
     addSeasonBtn.addEventListener('click', function() {
-        if (currentAnimeIndex < 0) return;
+        if (currentAnimeIndex < 0 && !tempSeasons) return;
         
         const seasons = currentAnimeIndex >= 0 ? 
             animeData[currentAnimeIndex].seasons : 
             tempSeasons;
-        
-        if (!seasons) {
-            return;
-        }
         
         const newSeasonNumber = seasons.length > 0 ? 
             Math.max(...seasons.map(s => s.number)) + 1 : 1;
         
         seasons.push({
             number: newSeasonNumber,
-            episodes: []
+            episodes: [{
+                title: `Episódio 1`,
+                videoUrl: "",
+                duration: 0
+            }]
         });
         
         updateSeasonList();
@@ -195,12 +170,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Remover temporada
     removeSeasonBtn.addEventListener('click', function() {
-        if (currentAnimeIndex >= 0 && currentSeasonIndex >= 0 && 
+        if ((currentAnimeIndex >= 0 || tempSeasons) && currentSeasonIndex >= 0 && 
             confirm('Tem certeza que deseja remover esta temporada?')) {
             
             if (currentAnimeIndex >= 0) {
                 animeData[currentAnimeIndex].seasons.splice(currentSeasonIndex, 1);
-            } else if (tempSeasons) {
+            } else {
                 tempSeasons.splice(currentSeasonIndex, 1);
             }
             
@@ -213,19 +188,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Adicionar episódio
     addEpisodeBtn.addEventListener('click', function() {
-        if (currentAnimeIndex < 0 && !tempSeasons) return;
-        if (currentSeasonIndex < 0) return;
+        if ((currentAnimeIndex < 0 && !tempSeasons) || currentSeasonIndex < 0) return;
         
         const seasons = currentAnimeIndex >= 0 ? 
             animeData[currentAnimeIndex].seasons : 
             tempSeasons;
         
-        if (!seasons || currentSeasonIndex >= seasons.length) return;
-        
         const episodes = seasons[currentSeasonIndex].episodes;
+        const newEpisodeNumber = episodes.length + 1;
+        
         episodes.push({
-            title: `Episódio ${episodes.length + 1}`,
-            videoUrl: "",
+            title: `Episódio ${newEpisodeNumber}`,
+            videoUrl: '',
             duration: 0
         });
         
@@ -238,53 +212,44 @@ document.addEventListener('DOMContentLoaded', function() {
     // Selecionar episódio
     episodeSelect.addEventListener('change', function() {
         currentEpisodeIndex = episodeSelect.selectedIndex;
-        if ((currentAnimeIndex >= 0 || tempSeasons) && currentSeasonIndex >= 0 && currentEpisodeIndex >= 0) {
+        if (((currentAnimeIndex >= 0 || tempSeasons) && currentSeasonIndex >= 0 && currentEpisodeIndex >= 0)) {
             const seasons = currentAnimeIndex >= 0 ? 
                 animeData[currentAnimeIndex].seasons : 
                 tempSeasons;
-            
-            if (seasons && currentSeasonIndex < seasons.length) {
-                const episode = seasons[currentSeasonIndex].episodes[currentEpisodeIndex];
-                episodeTitle.value = episode.title;
-                episodeVideoUrl.value = episode.videoUrl;
-                episodeDuration.value = episode.duration;
-                return;
-            }
+            const episode = seasons[currentSeasonIndex].episodes[currentEpisodeIndex];
+            episodeTitle.value = episode.title;
+            episodeVideoUrl.value = episode.videoUrl;
+            episodeDuration.value = episode.duration;
+        } else {
+            episodeTitle.value = '';
+            episodeVideoUrl.value = '';
+            episodeDuration.value = '';
         }
-        
-        // Limpar campos se não houver episódio selecionado
-        episodeTitle.value = '';
-        episodeVideoUrl.value = '';
-        episodeDuration.value = '';
     });
     
     // Remover episódio
     removeEpisodeBtn.addEventListener('click', function() {
-        if ((currentAnimeIndex < 0 && !tempSeasons) || currentSeasonIndex < 0 || currentEpisodeIndex < 0) return;
-        
-        if (confirm('Tem certeza que deseja remover este episódio?')) {
+        if ((currentAnimeIndex >= 0 || tempSeasons) && currentSeasonIndex >= 0 && currentEpisodeIndex >= 0 && 
+            confirm('Tem certeza que deseja remover este episódio?')) {
+            
             const seasons = currentAnimeIndex >= 0 ? 
                 animeData[currentAnimeIndex].seasons : 
                 tempSeasons;
             
-            if (seasons && currentSeasonIndex < seasons.length) {
-                seasons[currentSeasonIndex].episodes.splice(currentEpisodeIndex, 1);
-                updateEpisodeList();
-                updateJsonOutput();
-                currentEpisodeIndex = -1;
-            }
+            seasons[currentSeasonIndex].episodes.splice(currentEpisodeIndex, 1);
+            updateEpisodeList();
+            updateJsonOutput();
+            currentEpisodeIndex = -1;
         }
     });
     
     // Salvar episódio
     saveEpisodeBtn.addEventListener('click', function() {
-        if ((currentAnimeIndex < 0 && !tempSeasons) || currentSeasonIndex < 0 || currentEpisodeIndex < 0) return;
-        
-        const seasons = currentAnimeIndex >= 0 ? 
-            animeData[currentAnimeIndex].seasons : 
-            tempSeasons;
-        
-        if (seasons && currentSeasonIndex < seasons.length) {
+        if ((currentAnimeIndex >= 0 || tempSeasons) && currentSeasonIndex >= 0 && currentEpisodeIndex >= 0) {
+            const seasons = currentAnimeIndex >= 0 ? 
+                animeData[currentAnimeIndex].seasons : 
+                tempSeasons;
+                
             const episode = seasons[currentSeasonIndex].episodes[currentEpisodeIndex];
             episode.title = episodeTitle.value;
             episode.videoUrl = episodeVideoUrl.value;
@@ -297,8 +262,25 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Salvar anime
     saveAnimeBtn.addEventListener('click', function() {
-        if (!animeForm.checkValidity()) {
-            alert('Por favor, preencha todos os campos obrigatórios.');
+        // Validar campos obrigatórios
+        const requiredFields = [
+            animeId, animeTitle, animeDescription, 
+            animeThumbnail, animeTrailer, animeType,
+            animeDateAdded, animeYear, animeRating
+        ];
+        
+        let isValid = true;
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.style.borderColor = 'red';
+                isValid = false;
+            } else {
+                field.style.borderColor = '';
+            }
+        });
+        
+        if (!isValid) {
+            alert('Por favor, preencha todos os campos obrigatórios destacados em vermelho.');
             return;
         }
         
@@ -325,11 +307,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Adicionar novo anime
             animeData.push(anime);
             currentAnimeIndex = animeData.length - 1;
-            tempSeasons = null;
         }
         
         updateAnimeList();
         updateJsonOutput();
+        tempSeasons = null;
     });
     
     // Cancelar edição
@@ -412,11 +394,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateSeasonList() {
         seasonSelect.innerHTML = '';
-        
         const seasons = currentAnimeIndex >= 0 ? 
-            animeData[currentAnimeIndex].seasons || [] : 
-            tempSeasons || [];
-        
+            (animeData[currentAnimeIndex].seasons || []) : 
+            (tempSeasons || []);
+            
         seasons.forEach(season => {
             const option = document.createElement('option');
             option.textContent = `Temporada ${season.number} (${season.episodes.length} episódios)`;
@@ -430,23 +411,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updateEpisodeList() {
         episodeSelect.innerHTML = '';
-        
         if ((currentAnimeIndex >= 0 || tempSeasons) && currentSeasonIndex >= 0) {
             const seasons = currentAnimeIndex >= 0 ? 
                 animeData[currentAnimeIndex].seasons : 
                 tempSeasons;
+            const episodes = seasons[currentSeasonIndex].episodes || [];
+            episodes.forEach(episode => {
+                const option = document.createElement('option');
+                option.textContent = episode.title;
+                episodeSelect.appendChild(option);
+            });
             
-            if (seasons && currentSeasonIndex < seasons.length) {
-                const episodes = seasons[currentSeasonIndex].episodes || [];
-                episodes.forEach(episode => {
-                    const option = document.createElement('option');
-                    option.textContent = episode.title;
-                    episodeSelect.appendChild(option);
-                });
-                
-                if (currentEpisodeIndex >= 0 && currentEpisodeIndex < episodeSelect.options.length) {
-                    episodeSelect.selectedIndex = currentEpisodeIndex;
-                }
+            if (currentEpisodeIndex >= 0 && currentEpisodeIndex < episodeSelect.options.length) {
+                episodeSelect.selectedIndex = currentEpisodeIndex;
             }
         }
     }
@@ -465,6 +442,11 @@ document.addEventListener('DOMContentLoaded', function() {
         currentSeasonIndex = -1;
         currentEpisodeIndex = -1;
         tempSeasons = null;
+        
+        // Remover destacados de erro
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            el.style.borderColor = '';
+        });
     }
     
     // Inicialização
