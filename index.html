@@ -20,7 +20,7 @@
             <h2>Editor</h2>
             
             <div class="anime-list">
-                <h3>Animes/Movies</h3>
+                <h3>Animes/Movies/OVAs</h3>
                 <select id="animeSelect" size="5"></select>
                 <div class="anime-list-buttons">
                     <button id="addAnimeBtn">Adicionar Novo</button>
@@ -61,6 +61,7 @@
                         <select id="animeType" required>
                             <option value="anime">Anime</option>
                             <option value="movie">Movie</option>
+                            <option value="ova">OVA</option>
                         </select>
                     </div>
                     
@@ -72,7 +73,24 @@
                     <div class="form-group">
                         <label>Categorias:</label>
                         <div class="categories-container">
-                            <input type="text" id="newCategory" placeholder="Nova categoria">
+                            <select id="categorySelect">
+                                <option value="action">Action</option>
+                                <option value="adventure">Adventure</option>
+                                <option value="comedy">Comedy</option>
+                                <option value="drama">Drama</option>
+                                <option value="fantasy">Fantasy</option>
+                                <option value="horror">Horror</option>
+                                <option value="mecha">Mecha</option>
+                                <option value="mystery">Mystery</option>
+                                <option value="psychological">Psychological</option>
+                                <option value="romance">Romance</option>
+                                <option value="sci-fi">Sci-Fi</option>
+                                <option value="slice of life">Slice of Life</option>
+                                <option value="superhero">Superhero</option>
+                                <option value="supernatural">Supernatural</option>
+                                <option value="thriller">Thriller</option>
+                            </select>
+                            <input type="text" id="newCategory" placeholder="Ou digite uma nova">
                             <button type="button" id="addCategoryBtn">Adicionar</button>
                             <div id="categoriesList" class="categories-list"></div>
                         </div>
