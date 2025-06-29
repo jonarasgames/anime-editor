@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Anime Database</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Editor de Anime Database</h1>
+        
+        <div class="upload-section">
+            <h2>Carregar Arquivo JSON Existente</h2>
+            <input type="file" id="jsonFile" accept=".json">
+            <button id="loadBtn">Carregar</button>
+        </div>
+        
+        <div class="editor-section">
+            <h2>Editor</h2>
+            
+            <div class="anime-list">
+                <h3>Animes/Movies</h3>
+                <select id="animeSelect" size="5"></select>
+                <div class="anime-list-buttons">
+                    <button id="addAnimeBtn">Adicionar Novo</button>
+                    <button id="removeAnimeBtn">Remover Selecionado</button>
+                </div>
+            </div>
+            
+            <div class="anime-form">
+                <h3>Detalhes do Anime</h3>
+                <form id="animeForm">
+                    <div class="form-group">
+                        <label for="animeId">ID:</label>
+                        <input type="number" id="animeId" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="animeTitle">Título:</label>
+                        <input type="text" id="animeTitle" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="animeDescription">Descrição:</label>
+                        <textarea id="animeDescription" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="animeThumbnail">Thumbnail URL:</label>
+                        <input type="url" id="animeThumbnail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="animeTrailer">Trailer URL:</label>
+                        <input type="url" id="animeTrailer" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="animeType">Tipo:</label>
+                        <select id="animeType" required>
+                            <option value="anime">Anime</option>
+                            <option value="movie">Movie</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="animeDateAdded">Data de Adição:</label>
+                        <input type="date" id="animeDateAdded" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Categorias:</label>
+                        <div class="categories-container">
+                            <input type="text" id="newCategory" placeholder="Nova categoria">
+                            <button type="button" id="addCategoryBtn">Adicionar</button>
+                            <div id="categoriesList" class="categories-list"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="animeYear">Ano:</label>
+                        <input type="number" id="animeYear" min="1900" max="2099" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="animeRating">Rating:</label>
+                        <input type="number" id="animeRating" min="0" max="10" step="0.1" required>
+                    </div>
+                    
+                    <h4>Temporadas e Episódios</h4>
+                    <div class="seasons-container">
+                        <div class="season-list">
+                            <select id="seasonSelect" size="3"></select>
+                            <div class="season-list-buttons">
+                                <button type="button" id="addSeasonBtn">Adicionar Temporada</button>
+                                <button type="button" id="removeSeasonBtn">Remover Temporada</button>
+                            </div>
+                        </div>
+                        
+                        <div class="episodes-container">
+                            <div class="episode-list">
+                                <select id="episodeSelect" size="5"></select>
+                                <div class="episode-list-buttons">
+                                    <button type="button" id="addEpisodeBtn">Adicionar Episódio</button>
+                                    <button type="button" id="removeEpisodeBtn">Remover Episódio</button>
+                                </div>
+                            </div>
+                            
+                            <div class="episode-form">
+                                <div class="form-group">
+                                    <label for="episodeTitle">Título do Episódio:</label>
+                                    <input type="text" id="episodeTitle" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="episodeVideoUrl">Video URL:</label>
+                                    <input type="url" id="episodeVideoUrl" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="episodeDuration">Duração (segundos):</label>
+                                    <input type="number" id="episodeDuration" min="0" required>
+                                </div>
+                                
+                                <button type="button" id="saveEpisodeBtn">Salvar Episódio</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="button" id="saveAnimeBtn">Salvar Anime</button>
+                        <button type="button" id="cancelBtn">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="output-section">
+            <h2>JSON Gerado</h2>
+            <button id="downloadBtn">Download JSON</button>
+            <button id="copyBtn">Copiar para Área de Transferência</button>
+            <pre id="jsonOutput"></pre>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
