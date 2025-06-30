@@ -27,7 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const removeEpisodeBtn = document.getElementById('removeEpisodeBtn');
     const episodeTitle = document.getElementById('episodeTitle');
     const episodeVideoUrl = document.getElementById('episodeVideoUrl');
-    const episodeDuration = document.getElementById('episodeDuration');
+    const episodeHours = document.getElementById('episodeHours');
+    const episodeMinutes = document.getElementById('episodeMinutes');
+    const episodeSeconds = document.getElementById('episodeSeconds');
+    const durationPreview = document.getElementById('durationPreview');
     const saveEpisodeBtn = document.getElementById('saveEpisodeBtn');
     const saveAnimeBtn = document.getElementById('saveAnimeBtn');
     const cancelBtn = document.getElementById('cancelBtn');
@@ -219,11 +222,26 @@ document.addEventListener('DOMContentLoaded', function() {
             const episode = seasons[currentSeasonIndex].episodes[currentEpisodeIndex];
             episodeTitle.value = episode.title;
             episodeVideoUrl.value = episode.videoUrl;
-            episodeDuration.value = episode.duration;
+            
+            // Converter segundos para H:M:S
+            const totalSeconds = episode.duration || 0;
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            episodeHours.value = hours;
+            episodeMinutes.value = minutes;
+            episodeSeconds.value = seconds;
+            
+            // Atualizar preview
+            updateDurationPreview(totalSeconds);
         } else {
             episodeTitle.value = '';
             episodeVideoUrl.value = '';
-            episodeDuration.value = '';
+            episodeHours.value = '';
+            episodeMinutes.value = '';
+            episodeSeconds.value = '';
+            durationPreview.textContent = '';
         }
     });
     
@@ -253,7 +271,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const episode = seasons[currentSeasonIndex].episodes[currentEpisodeIndex];
             episode.title = episodeTitle.value;
             episode.videoUrl = episodeVideoUrl.value;
-            episode.duration = parseInt(episodeDuration.value) || 0;
+            
+            // Converter H:M:S para segundos
+            const hours = parseInt(episodeHours.value) || 0;
+            const minutes = parseInt(episodeMinutes.value) || 0;
+            const seconds = parseInt(episodeSeconds.value) || 0;
+            episode.duration = (hours * 3600) + (minutes * 60) + seconds;
+            
+            // Atualizar preview
+            updateDurationPreview(episode.duration);
             
             updateEpisodeList();
             updateJsonOutput();
@@ -428,6 +454,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    function updateDurationPreview(totalSeconds) {
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        durationPreview.textContent = `Duração total: ${totalSeconds} segundos (${hours}h ${minutes}m ${seconds}s)`;
+    }
+    
     function updateJsonOutput() {
         jsonOutput.textContent = JSON.stringify(animeData, null, 2);
     }
@@ -442,6 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentSeasonIndex = -1;
         currentEpisodeIndex = -1;
         tempSeasons = null;
+        durationPreview.textContent = '';
         
         // Remover destacados de erro
         document.querySelectorAll('input, textarea, select').forEach(el => {
