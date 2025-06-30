@@ -137,8 +137,15 @@
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="episodeDuration">Duração (segundos):</label>
-                                    <input type="number" id="episodeDuration" min="0" required>
+                                    <label>Duração:</label>
+                                    <div class="duration-fields">
+                                        <input type="number" id="episodeHours" min="0" placeholder="Horas">
+                                        <span>:</span>
+                                        <input type="number" id="episodeMinutes" min="0" max="59" placeholder="Min">
+                                        <span>:</span>
+                                        <input type="number" id="episodeSeconds" min="0" max="59" placeholder="Seg">
+                                    </div>
+                                    <div id="durationPreview" class="duration-preview"></div>
                                 </div>
                                 
                                 <button type="button" id="saveEpisodeBtn">Salvar Episódio</button>
