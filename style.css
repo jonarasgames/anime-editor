@@ -147,6 +147,26 @@ select {
     margin-bottom: 15px;
 }
 
+.duration-fields {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.duration-fields input {
+    width: 60px;
+    text-align: center;
+}
+
+.duration-preview {
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: #666;
+    padding: 5px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+}
+
 @media (max-width: 768px) {
     .seasons-container, .episodes-container {
         flex-direction: column;
