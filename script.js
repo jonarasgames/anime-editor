@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const jsonOutput = document.getElementById('jsonOutput');
     const downloadBtn = document.getElementById('downloadBtn');
     const copyBtn = document.getElementById('copyBtn');
+    const animeOpenings = document.getElementById('animeOpenings');
+    const animeEndings = document.getElementById('animeEndings');
+    const animeOsts = document.getElementById('animeOsts');
     
     // Dados do aplicativo
     let animeData = [];
@@ -323,7 +326,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 animeData[currentAnimeIndex].seasons || [] : 
                 tempSeasons || [],
             year: parseInt(animeYear.value),
-            rating: parseFloat(animeRating.value)
+            rating: parseFloat(animeRating.value),
+            openings: animeOpenings.value ? animeOpenings.value.split(',').map(s => s.trim()) : [],
+            endings: animeEndings.value ? animeEndings.value.split(',').map(s => s.trim()) : [],
+            osts: animeOsts.value ? animeOsts.value.split(',').map(s => s.trim()) : [],
         };
         
         if (currentAnimeIndex >= 0) {
@@ -392,6 +398,11 @@ document.addEventListener('DOMContentLoaded', function() {
         animeDateAdded.value = anime.dateAdded;
         animeYear.value = anime.year;
         animeRating.value = anime.rating;
+        
+        // Carregar os novos campos de música
+        animeOpenings.value = anime.openings ? anime.openings.join(', ') : '';
+        animeEndings.value = anime.endings ? anime.endings.join(', ') : '';
+        animeOsts.value = anime.osts ? anime.osts.join(', ') : '';
         
         categories = [...anime.categories];
         updateCategoriesList();
@@ -497,7 +508,9 @@ document.addEventListener('DOMContentLoaded', function() {
         currentEpisodeIndex = -1;
         tempSeasons = null;
         durationPreview.textContent = '';
-        
+        animeOpenings.value = '';
+        animeEndings.value = '';
+        animeOsts.value = '';
         // Remover destacados de erro
         document.querySelectorAll('input, textarea, select').forEach(el => {
             el.style.borderColor = '';
