@@ -116,10 +116,79 @@
                         <input type="text" id="animeEndings">
                     </div>
 
-                    <div class="form-group">
-                        <label for="animeOsts">OSTs (separados por vírgula):</label>
-                        <input type="text" id="animeOsts">
+                    <div class="music-section">
+                        <h4>Trilha Sonora</h4>
+                        
+                        <div class="music-tabs">
+                            <button type="button" class="music-tab active" data-type="openings">Openings</button>
+                            <button type="button" class="music-tab" data-type="endings">Endings</button>
+                            <button type="button" class="music-tab" data-type="osts">OSTs</button>
+                        </div>
+                        
+                        <div class="music-content">
+                            <!-- Openings -->
+                            <div class="music-list active" data-type="openings">
+                                <div class="music-list-header">
+                                    <h5>Openings</h5>
+                                    <button type="button" class="add-music-btn" data-type="openings">+ Adicionar Opening</button>
+                                </div>
+                                <div class="music-items" id="openingsList"></div>
+                            </div>
+                            
+                            <!-- Endings -->
+                            <div class="music-list" data-type="endings">
+                                <div class="music-list-header">
+                                    <h5>Endings</h5>
+                                    <button type="button" class="add-music-btn" data-type="endings">+ Adicionar Ending</button>
+                                </div>
+                                <div class="music-items" id="endingsList"></div>
+                            </div>
+                            
+                            <!-- OSTs -->
+                            <div class="music-list" data-type="osts">
+                                <div class="music-list-header">
+                                    <h5>OSTs</h5>
+                                    <button type="button" class="add-music-btn" data-type="osts">+ Adicionar OST</button>
+                                </div>
+                                <div class="music-items" id="ostsList"></div>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- Modal para edição de música -->
+                    <div class="modal" id="musicModal">
+                        <div class="modal-content">
+                            <span class="close-modal">&times;</span>
+                            <h3 id="modalTitle">Editar Música</h3>
+                            <form id="musicForm">
+                                <input type="hidden" id="musicType">
+                                <input type="hidden" id="musicIndex">
+                                
+                                <div class="form-group">
+                                    <label for="musicTitle">Título:</label>
+                                    <input type="text" id="musicTitle" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="musicArtist">Artista:</label>
+                                    <input type="text" id="musicArtist" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="musicAudio">Áudio URL:</label>
+                                    <input type="url" id="musicAudio" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="musicCover">Capa URL:</label>
+                                    <input type="url" id="musicCover">
+                                </div>
+                                
+                                <button type="submit" class="save-music-btn">Salvar</button>
+                            </form>
+                        </div>
+                    </div>
+
                     <h4>Temporadas e Episódios</h4>
                     <div class="seasons-container">
                         <div class="season-list">
