@@ -105,9 +105,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const reader = new FileReader();
+        
+        reader.onloadstart = function() {
+            console.log('Iniciando leitura do arquivo...');
+            loadBtn.disabled = true;
+            loadBtn.textContent = 'Carregando...';
+        };
+        
         reader.onload = function(e) {
             try {
+                console.log('Arquivo lido, processando...');
                 const parsedData = JSON.parse(e.target.result);
+                
                 if (!Array.isArray(parsedData)) {
                     throw new Error("O arquivo JSON deve conter um array de animes");
                 }
@@ -115,15 +124,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 animeData = parsedData;
                 updateAnimeList();
                 updateJsonOutput();
+                
+                console.log('Arquivo carregado com sucesso!');
                 alert('Arquivo carregado com sucesso!');
+                
             } catch (error) {
-                alert('Erro ao analisar o arquivo JSON: ' + error.message);
-                console.error(error);
+                console.error('Erro ao analisar JSON:', error);
+                alert('Erro ao carregar arquivo: ' + error.message);
+            } finally {
+                loadBtn.disabled = false;
+                loadBtn.textContent = 'Carregar';
             }
         };
+        
         reader.onerror = function() {
-            alert('Erro ao ler o arquivo.');
+            console.error('Erro na leitura do arquivo');
+            alert('Erro ao ler o arquivo. Verifique o console (F12) para detalhes.');
+            loadBtn.disabled = false;
+            loadBtn.textContent = 'Carregar';
         };
+        
+        reader.onabort = function() {
+            console.warn('Leitura abortada pelo usuário');
+            loadBtn.disabled = false;
+            loadBtn.textContent = 'Carregar';
+        };
+        
+        console.log('Lendo arquivo...');
         reader.readAsText(file);
     });
 
