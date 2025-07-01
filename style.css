@@ -172,3 +172,13 @@ select {
         flex-direction: column;
     }
 }
+
+.music-fields {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.music-fields .form-group {
+    flex: 1;
+}
