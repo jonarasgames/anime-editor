@@ -182,3 +182,144 @@ select {
 .music-fields .form-group {
     flex: 1;
 }
+
+/* Estilos para a seção de música */
+.music-section {
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.music-tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+.music-tab {
+    padding: 8px 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-bottom: 3px solid transparent;
+}
+
+.music-tab.active {
+    border-bottom-color: #3498db;
+    font-weight: bold;
+}
+
+.music-list {
+    display: none;
+}
+
+.music-list.active {
+    display: block;
+}
+
+.music-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.music-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.music-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.music-item-info {
+    flex: 1;
+}
+
+.music-item-title {
+    font-weight: bold;
+}
+
+.music-item-artist {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.music-item-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.music-item-actions button {
+    padding: 3px 6px;
+    font-size: 12px;
+}
+
+.add-music-btn {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.add-music-btn:hover {
+    background-color: #27ae60;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.save-music-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.save-music-btn:hover {
+    background-color: #2980b9;
+}
