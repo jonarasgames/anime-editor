@@ -108,6 +108,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 animeData = parsedData;
                 updateAnimeList();
                 updateJsonOutput();
+                
+                // Selecionar o primeiro anime automaticamente
+                if (animeData.length > 0) {
+                    animeSelect.selectedIndex = 0;
+                    animeSelect.dispatchEvent(new Event('change'));
+                }
+                
                 alert('Arquivo carregado com sucesso!');
             } catch (error) {
                 alert('Erro ao analisar o arquivo JSON: ' + error.message);
