@@ -336,9 +336,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Adicionar opening
+    // Adicionar opening - CORREÇÃO: Verifica se existe o array e cria se não existir
     addOpeningBtn.addEventListener('click', function() {
         if (currentAnimeIndex < 0) return;
+        
+        // Garante que o array de openings existe
+        if (!animeData[currentAnimeIndex].openings) {
+            animeData[currentAnimeIndex].openings = [];
+        }
         
         musicType.value = 'opening';
         musicIndex.value = '';
@@ -351,14 +356,20 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Resetar formulário
         musicForm.reset();
+        musicSeason.value = 1;
         
         // Abrir modal
         musicModal.style.display = 'block';
     });
     
-    // Adicionar ending
+    // Adicionar ending - CORREÇÃO: Verifica se existe o array e cria se não existir
     addEndingBtn.addEventListener('click', function() {
         if (currentAnimeIndex < 0) return;
+        
+        // Garante que o array de endings existe
+        if (!animeData[currentAnimeIndex].endings) {
+            animeData[currentAnimeIndex].endings = [];
+        }
         
         musicType.value = 'ending';
         musicIndex.value = '';
@@ -371,14 +382,20 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Resetar formulário
         musicForm.reset();
+        musicSeason.value = 1;
         
         // Abrir modal
         musicModal.style.display = 'block';
     });
     
-    // Adicionar OST
+    // Adicionar OST - CORREÇÃO: Verifica se existe o objeto e cria se não existir
     addOstBtn.addEventListener('click', function() {
         if (currentAnimeIndex < 0) return;
+        
+        // Garante que o objeto de OSTs existe
+        if (!animeData[currentAnimeIndex].osts) {
+            animeData[currentAnimeIndex].osts = {};
+        }
         
         musicType.value = 'ost';
         musicIndex.value = '';
@@ -393,6 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
         musicForm.reset();
         currentTracks = [];
         updateTracksList();
+        ostYear.value = animeData[currentAnimeIndex].year || '';
         
         // Abrir modal
         musicModal.style.display = 'block';
@@ -729,7 +747,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const anime = animeData[currentAnimeIndex];
         
-        // Openings
+        // Openings - CORREÇÃO: Garante que existe um array
         openingsList.innerHTML = '';
         (anime.openings || []).forEach((opening, index) => {
             const item = document.createElement('div');
@@ -745,7 +763,7 @@ document.addEventListener('DOMContentLoaded', function() {
             openingsList.appendChild(item);
         });
         
-        // Endings
+        // Endings - CORREÇÃO: Garante que existe um array
         endingsList.innerHTML = '';
         (anime.endings || []).forEach((ending, index) => {
             const item = document.createElement('div');
@@ -761,7 +779,7 @@ document.addEventListener('DOMContentLoaded', function() {
             endingsList.appendChild(item);
         });
         
-        // OSTs
+        // OSTs - CORREÇÃO: Garante que existe um objeto
         ostsList.innerHTML = '';
         Object.entries(anime.osts || {}).forEach(([ostTitle, ostData], index) => {
             const item = document.createElement('div');
