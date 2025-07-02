@@ -37,27 +37,48 @@ document.addEventListener('DOMContentLoaded', function() {
     const jsonOutput = document.getElementById('jsonOutput');
     const downloadBtn = document.getElementById('downloadBtn');
     const copyBtn = document.getElementById('copyBtn');
-    const animeOpenings = document.getElementById('animeOpenings');
-    const animeEndings = document.getElementById('animeEndings');
-    const animeOsts = document.getElementById('animeOsts');
-
-    //Adicione essas variáveis no início
-    const musicTabs = document.querySelectorAll('.music-tab');
-    const musicLists = document.querySelectorAll('.music-list');
-    const addMusicBtns = document.querySelectorAll('.add-music-btn');
-    const musicModal = document.getElementById('musicModal');
-    const closeModalBtn = document.querySelector('.close-modal');
-    const musicForm = document.getElementById('musicForm');
-    const modalTitle = document.getElementById('modalTitle');
-    const musicTypeInput = document.getElementById('musicType');
-    const musicIndexInput = document.getElementById('musicIndex');
-    const musicTitleInput = document.getElementById('musicTitle');
-    const musicArtistInput = document.getElementById('musicArtist');
-    const musicAudioInput = document.getElementById('musicAudio');
-    const musicCoverInput = document.getElementById('musicCover');
+    
+    // Elementos para músicas
     const openingsList = document.getElementById('openingsList');
     const endingsList = document.getElementById('endingsList');
     const ostsList = document.getElementById('ostsList');
+    const addOpeningBtn = document.getElementById('addOpeningBtn');
+    const addEndingBtn = document.getElementById('addEndingBtn');
+    const addOstBtn = document.getElementById('addOstBtn');
+    
+    // Elementos do modal de música
+    const musicModal = document.getElementById('musicModal');
+    const musicModalTitle = document.getElementById('musicModalTitle');
+    const musicForm = document.getElementById('musicForm');
+    const musicType = document.getElementById('musicType');
+    const musicIndex = document.getElementById('musicIndex');
+    const musicTitle = document.getElementById('musicTitle');
+    const musicArtist = document.getElementById('musicArtist');
+    const musicAudio = document.getElementById('musicAudio');
+    const musicCover = document.getElementById('musicCover');
+    const musicSeason = document.getElementById('musicSeason');
+    const saveMusicBtn = document.getElementById('saveMusicBtn');
+    const cancelMusicBtn = document.getElementById('cancelMusicBtn');
+    const closeModal = document.querySelector('.close');
+    
+    // Elementos do modal de faixa
+    const trackModal = document.getElementById('trackModal');
+    const trackForm = document.getElementById('trackForm');
+    const trackIndex = document.getElementById('trackIndex');
+    const trackTitle = document.getElementById('trackTitle');
+    const trackArtist = document.getElementById('trackArtist');
+    const trackAudio = document.getElementById('trackAudio');
+    const trackDuration = document.getElementById('trackDuration');
+    const saveTrackBtn = document.getElementById('saveTrackBtn');
+    const cancelTrackBtn = document.getElementById('cancelTrackBtn');
+    const closeTrackModal = trackModal.querySelector('.close');
+    
+    // Elementos específicos de OST
+    const ostYearField = document.getElementById('ostYearField');
+    const ostYear = document.getElementById('ostYear');
+    const ostTracksField = document.getElementById('ostTracksField');
+    const tracksList = document.getElementById('tracksList');
+    const addTrackBtn = document.getElementById('addTrackBtn');
     
     // Dados do aplicativo
     let animeData = [];
@@ -66,35 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentEpisodeIndex = -1;
     let categories = [];
     let tempSeasons = null;
-
-    // Adicione esses event listeners
-    musicTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const type = tab.dataset.type;
-            
-            // Ativar tab
-            musicTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            
-            // Mostrar conteúdo correspondente
-            musicLists.forEach(list => {
-                list.classList.remove('active');
-                if (list.dataset.type === type) {
-                    list.classList.add('active');
-                }
-            });
-        });
-    });
-
-    addMusicBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const type = btn.dataset.type;
-            openMusicModal(type);
-        });
-    });
-
-    closeModalBtn.addEventListener('click', closeModal);
-    musicForm.addEventListener('submit', saveMusic);
+    let currentTracks = [];
     
     // Carregar arquivo JSON
     loadBtn.addEventListener('click', function() {
@@ -105,18 +98,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         const reader = new FileReader();
-        
-        reader.onloadstart = function() {
-            console.log('Iniciando leitura do arquivo...');
-            loadBtn.disabled = true;
-            loadBtn.textContent = 'Carregando...';
-        };
-        
         reader.onload = function(e) {
             try {
-                console.log('Arquivo lido, processando...');
                 const parsedData = JSON.parse(e.target.result);
-                
                 if (!Array.isArray(parsedData)) {
                     throw new Error("O arquivo JSON deve conter um array de animes");
                 }
@@ -124,151 +108,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 animeData = parsedData;
                 updateAnimeList();
                 updateJsonOutput();
-                
-                console.log('Arquivo carregado com sucesso!');
                 alert('Arquivo carregado com sucesso!');
-                
             } catch (error) {
-                console.error('Erro ao analisar JSON:', error);
-                alert('Erro ao carregar arquivo: ' + error.message);
-            } finally {
-                loadBtn.disabled = false;
-                loadBtn.textContent = 'Carregar';
+                alert('Erro ao analisar o arquivo JSON: ' + error.message);
+                console.error(error);
             }
         };
-        
         reader.onerror = function() {
-            console.error('Erro na leitura do arquivo');
-            alert('Erro ao ler o arquivo. Verifique o console (F12) para detalhes.');
-            loadBtn.disabled = false;
-            loadBtn.textContent = 'Carregar';
+            alert('Erro ao ler o arquivo.');
         };
-        
-        reader.onabort = function() {
-            console.warn('Leitura abortada pelo usuário');
-            loadBtn.disabled = false;
-            loadBtn.textContent = 'Carregar';
-        };
-        
-        console.log('Lendo arquivo...');
         reader.readAsText(file);
     });
-
-    // Adicione essas funções
-    function openMusicModal(type, index = -1) {
-        musicTypeInput.value = type;
-        musicIndexInput.value = index;
-        
-        // Definir título do modal
-        const typeNames = {
-            openings: 'Opening',
-            endings: 'Ending',
-            osts: 'OST'
-        };
-        modalTitle.textContent = index === -1 ? `Adicionar ${typeNames[type]}` : `Editar ${typeNames[type]}`;
-        
-        // Preencher formulário se estiver editando
-        if (index !== -1 && currentAnimeIndex !== -1) {
-            const musicItem = animeData[currentAnimeIndex][type][index];
-            musicTitleInput.value = musicItem.title || '';
-            musicArtistInput.value = musicItem.artist || '';
-            musicAudioInput.value = musicItem.audio || '';
-            musicCoverInput.value = musicItem.cover || '';
-        } else {
-            musicForm.reset();
-        }
-        
-        musicModal.style.display = 'block';
-    }
-
-    function closeModal() {
-        musicModal.style.display = 'none';
-    }
-
-    function saveMusic(e) {
-        e.preventDefault();
-        
-        const type = musicTypeInput.value;
-        const index = parseInt(musicIndexInput.value);
-        const musicData = {
-            title: musicTitleInput.value.trim(),
-            artist: musicArtistInput.value.trim(),
-            audio: musicAudioInput.value.trim(),
-            cover: musicCoverInput.value.trim()
-        };
-        
-        if (currentAnimeIndex !== -1) {
-            if (!animeData[currentAnimeIndex][type]) {
-                animeData[currentAnimeIndex][type] = [];
-            }
-            
-            if (index === -1) {
-                // Adicionar novo
-                animeData[currentAnimeIndex][type].push(musicData);
-            } else {
-                // Editar existente
-                animeData[currentAnimeIndex][type][index] = musicData;
-            }
-            
-            updateMusicLists();
-            updateJsonOutput();
-            closeModal();
-        }
-    }
-
-    function updateMusicLists() {
-        if (currentAnimeIndex === -1) return;
-        
-        const anime = animeData[currentAnimeIndex];
-        
-        // Openings
-        openingsList.innerHTML = '';
-        if (anime.openings && anime.openings.length > 0) {
-            anime.openings.forEach((opening, index) => {
-                openingsList.appendChild(createMusicItem('openings', opening, index));
-            });
-        } else {
-            openingsList.innerHTML = '<p class="no-music">Nenhum opening adicionado</p>';
-        }
-        
-        // Endings
-        endingsList.innerHTML = '';
-        if (anime.endings && anime.endings.length > 0) {
-            anime.endings.forEach((ending, index) => {
-                endingsList.appendChild(createMusicItem('endings', ending, index));
-            });
-        } else {
-            endingsList.innerHTML = '<p class="no-music">Nenhum ending adicionado</p>';
-        }
-        
-        // OSTs
-        ostsList.innerHTML = '';
-        if (anime.osts && anime.osts.length > 0) {
-            anime.osts.forEach((ost, index) => {
-                ostsList.appendChild(createMusicItem('osts', ost, index));
-            });
-        } else {
-            ostsList.innerHTML = '<p class="no-music">Nenhuma OST adicionada</p>';
-        }
-    }
-
-    function createMusicItem(type, music, index) {
-        const item = document.createElement('div');
-        item.className = 'music-item';
-        
-        item.innerHTML = `
-            <div class="music-item-info">
-                <div class="music-item-title">${music.title}</div>
-                <div class="music-item-artist">${music.artist}</div>
-            </div>
-            <div class="music-item-actions">
-                <button type="button" class="edit-music" data-type="${type}" data-index="${index}">Editar</button>
-                <button type="button" class="remove-music" data-type="${type}" data-index="${index}">Remover</button>
-            </div>
-        `;
-        
-        return item;
-    }
     
     // Adicionar novo anime
     addAnimeBtn.addEventListener('click', function() {
@@ -479,6 +329,191 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Adicionar opening
+    addOpeningBtn.addEventListener('click', function() {
+        if (currentAnimeIndex < 0) return;
+        
+        musicType.value = 'opening';
+        musicIndex.value = '';
+        musicModalTitle.textContent = 'Adicionar Opening';
+        
+        // Mostrar campos relevantes
+        document.getElementById('seasonField').style.display = 'block';
+        document.getElementById('ostYearField').style.display = 'none';
+        document.getElementById('ostTracksField').style.display = 'none';
+        
+        // Resetar formulário
+        musicForm.reset();
+        
+        // Abrir modal
+        musicModal.style.display = 'block';
+    });
+    
+    // Adicionar ending
+    addEndingBtn.addEventListener('click', function() {
+        if (currentAnimeIndex < 0) return;
+        
+        musicType.value = 'ending';
+        musicIndex.value = '';
+        musicModalTitle.textContent = 'Adicionar Ending';
+        
+        // Mostrar campos relevantes
+        document.getElementById('seasonField').style.display = 'block';
+        document.getElementById('ostYearField').style.display = 'none';
+        document.getElementById('ostTracksField').style.display = 'none';
+        
+        // Resetar formulário
+        musicForm.reset();
+        
+        // Abrir modal
+        musicModal.style.display = 'block';
+    });
+    
+    // Adicionar OST
+    addOstBtn.addEventListener('click', function() {
+        if (currentAnimeIndex < 0) return;
+        
+        musicType.value = 'ost';
+        musicIndex.value = '';
+        musicModalTitle.textContent = 'Adicionar OST';
+        
+        // Mostrar campos relevantes
+        document.getElementById('seasonField').style.display = 'none';
+        document.getElementById('ostYearField').style.display = 'block';
+        document.getElementById('ostTracksField').style.display = 'block';
+        
+        // Resetar formulário e limpar faixas
+        musicForm.reset();
+        currentTracks = [];
+        updateTracksList();
+        
+        // Abrir modal
+        musicModal.style.display = 'block';
+    });
+    
+    // Adicionar faixa à OST
+    addTrackBtn.addEventListener('click', function() {
+        trackIndex.value = '';
+        trackForm.reset();
+        trackModal.style.display = 'block';
+    });
+    
+    // Salvar música
+    saveMusicBtn.addEventListener('click', function() {
+        const type = musicType.value;
+        const index = musicIndex.value;
+        
+        if (!musicTitle.value || !musicArtist.value || !musicAudio.value) {
+            alert('Por favor, preencha todos os campos obrigatórios.');
+            return;
+        }
+        
+        const anime = animeData[currentAnimeIndex];
+        
+        if (type === 'ost') {
+            if (!ostYear.value) {
+                alert('Por favor, informe o ano da OST.');
+                return;
+            }
+            
+            const ostData = {
+                title: musicTitle.value,
+                year: parseInt(ostYear.value),
+                cover: musicCover.value || '',
+                tracks: [...currentTracks]
+            };
+            
+            if (index === '') {
+                // Adicionar nova OST
+                if (!anime.osts) anime.osts = {};
+                const ostKey = musicTitle.value;
+                anime.osts[ostKey] = ostData;
+            } else {
+                // Editar OST existente
+                const ostKeys = Object.keys(anime.osts || {});
+                const oldKey = ostKeys[index];
+                delete anime.osts[oldKey];
+                anime.osts[musicTitle.value] = ostData;
+            }
+        } else {
+            const musicData = {
+                title: musicTitle.value,
+                artist: musicArtist.value,
+                audio: musicAudio.value,
+                cover: musicCover.value || '',
+                type: type,
+                season: parseInt(musicSeason.value) || 1
+            };
+            
+            if (index === '') {
+                // Adicionar nova música
+                if (!anime[type + 's']) anime[type + 's'] = [];
+                anime[type + 's'].push(musicData);
+            } else {
+                // Editar música existente
+                anime[type + 's'][index] = musicData;
+            }
+        }
+        
+        updateMusicLists();
+        updateJsonOutput();
+        musicModal.style.display = 'none';
+    });
+    
+    // Salvar faixa
+    saveTrackBtn.addEventListener('click', function() {
+        if (!trackTitle.value || !trackAudio.value || !trackDuration.value) {
+            alert('Por favor, preencha todos os campos obrigatórios.');
+            return;
+        }
+        
+        const trackData = {
+            title: trackTitle.value,
+            artist: trackArtist.value || '',
+            audio: trackAudio.value,
+            duration: parseInt(trackDuration.value)
+        };
+        
+        const index = trackIndex.value;
+        if (index === '') {
+            // Adicionar nova faixa
+            currentTracks.push(trackData);
+        } else {
+            // Editar faixa existente
+            currentTracks[index] = trackData;
+        }
+        
+        updateTracksList();
+        trackModal.style.display = 'none';
+    });
+    
+    // Fechar modais
+    closeModal.addEventListener('click', function() {
+        musicModal.style.display = 'none';
+    });
+    
+    closeTrackModal.addEventListener('click', function() {
+        trackModal.style.display = 'none';
+    });
+    
+    cancelMusicBtn.addEventListener('click', function() {
+        musicModal.style.display = 'none';
+    });
+    
+    cancelTrackBtn.addEventListener('click', function() {
+        trackModal.style.display = 'none';
+    });
+    
+    // Fechar modais ao clicar fora
+    window.addEventListener('click', function(event) {
+        if (event.target === musicModal) {
+            musicModal.style.display = 'none';
+        }
+        if (event.target === trackModal) {
+            trackModal.style.display = 'none';
+        }
+    });
+    
     // Salvar anime
     saveAnimeBtn.addEventListener('click', function() {
         // Validar campos obrigatórios
@@ -516,14 +551,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 animeData[currentAnimeIndex].seasons || [] : 
                 tempSeasons || [],
             year: parseInt(animeYear.value),
-            rating: parseFloat(animeRating.value),
-            openings: currentAnimeIndex >= 0 && animeData[currentAnimeIndex].openings ? 
-                animeData[currentAnimeIndex].openings : [],
-            endings: currentAnimeIndex >= 0 && animeData[currentAnimeIndex].endings ? 
-                animeData[currentAnimeIndex].endings : [],
-            osts: currentAnimeIndex >= 0 && animeData[currentAnimeIndex].osts ? 
-                animeData[currentAnimeIndex].osts : [],
+            rating: parseFloat(animeRating.value)
         };
+        
+        // Preservar openings, endings e osts se estiver editando
+        if (currentAnimeIndex >= 0) {
+            const existingAnime = animeData[currentAnimeIndex];
+            anime.openings = existingAnime.openings || [];
+            anime.endings = existingAnime.endings || [];
+            anime.osts = existingAnime.osts || {};
+        } else {
+            anime.openings = [];
+            anime.endings = [];
+            anime.osts = {};
+        }
         
         if (currentAnimeIndex >= 0) {
             // Atualizar anime existente
@@ -592,17 +633,15 @@ document.addEventListener('DOMContentLoaded', function() {
         animeYear.value = anime.year;
         animeRating.value = anime.rating;
         
-        // Carregar os novos campos de música
-        animeOpenings.value = anime.openings ? anime.openings.join(', ') : '';
-        animeEndings.value = anime.endings ? anime.endings.join(', ') : '';
-        animeOsts.value = anime.osts ? anime.osts.join(', ') : '';
-        
-        categories = [...anime.categories];
+        categories = [...anime.categories || []];
         updateCategoriesList();
         
         // Atualizar listas de temporadas e episódios
         updateSeasonList();
         updateEpisodeList();
+        
+        // Atualizar listas de músicas
+        updateMusicLists();
         
         // Resetar campos de episódio
         episodeTitle.value = '';
@@ -610,9 +649,6 @@ document.addEventListener('DOMContentLoaded', function() {
         episodeHours.value = '';
         episodeMinutes.value = '';
         episodeSeconds.value = '';
-
-        // Atualizar listas de música
-        updateMusicLists();
         durationPreview.textContent = '';
     }
     
@@ -681,6 +717,181 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    function updateMusicLists() {
+        if (currentAnimeIndex < 0) return;
+        
+        const anime = animeData[currentAnimeIndex];
+        
+        // Openings
+        openingsList.innerHTML = '';
+        (anime.openings || []).forEach((opening, index) => {
+            const item = document.createElement('div');
+            item.className = 'music-item';
+            item.innerHTML = `
+                <h6>${opening.title}</h6>
+                <p>Artista: ${opening.artist} | Temporada: ${opening.season}</p>
+                <div class="music-actions">
+                    <button class="edit" data-type="opening" data-index="${index}">Editar</button>
+                    <button class="delete" data-type="opening" data-index="${index}">Remover</button>
+                </div>
+            `;
+            openingsList.appendChild(item);
+        });
+        
+        // Endings
+        endingsList.innerHTML = '';
+        (anime.endings || []).forEach((ending, index) => {
+            const item = document.createElement('div');
+            item.className = 'music-item';
+            item.innerHTML = `
+                <h6>${ending.title}</h6>
+                <p>Artista: ${ending.artist} | Temporada: ${ending.season}</p>
+                <div class="music-actions">
+                    <button class="edit" data-type="ending" data-index="${index}">Editar</button>
+                    <button class="delete" data-type="ending" data-index="${index}">Remover</button>
+                </div>
+            `;
+            endingsList.appendChild(item);
+        });
+        
+        // OSTs
+        ostsList.innerHTML = '';
+        Object.entries(anime.osts || {}).forEach(([ostTitle, ostData], index) => {
+            const item = document.createElement('div');
+            item.className = 'music-item';
+            item.innerHTML = `
+                <h6>${ostTitle}</h6>
+                <p>Ano: ${ostData.year} | Faixas: ${ostData.tracks?.length || 0}</p>
+                <div class="music-actions">
+                    <button class="edit" data-type="ost" data-index="${index}">Editar</button>
+                    <button class="delete" data-type="ost" data-index="${index}">Remover</button>
+                </div>
+            `;
+            ostsList.appendChild(item);
+        });
+        
+        // Adicionar eventos para editar/remover músicas
+        document.querySelectorAll('.music-actions .edit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const type = this.getAttribute('data-type');
+                const index = parseInt(this.getAttribute('data-index'));
+                editMusic(type, index);
+            });
+        });
+        
+        document.querySelectorAll('.music-actions .delete').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const type = this.getAttribute('data-type');
+                const index = parseInt(this.getAttribute('data-index'));
+                deleteMusic(type, index);
+            });
+        });
+    }
+    
+    function updateTracksList() {
+        tracksList.innerHTML = '';
+        currentTracks.forEach((track, index) => {
+            const item = document.createElement('div');
+            item.className = 'track-item';
+            item.innerHTML = `
+                <h6>${track.title}</h6>
+                <p>Artista: ${track.artist || 'N/A'} | Duração: ${track.duration}s</p>
+                <div class="track-actions">
+                    <button class="edit" data-index="${index}">Editar</button>
+                    <button class="delete" data-index="${index}">Remover</button>
+                </div>
+            `;
+            tracksList.appendChild(item);
+        });
+        
+        // Adicionar eventos para editar/remover faixas
+        document.querySelectorAll('.track-actions .edit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                editTrack(index);
+            });
+        });
+        
+        document.querySelectorAll('.track-actions .delete').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                currentTracks.splice(index, 1);
+                updateTracksList();
+            });
+        });
+    }
+    
+    function editMusic(type, index) {
+        const anime = animeData[currentAnimeIndex];
+        
+        musicType.value = type;
+        musicIndex.value = index;
+        musicModalTitle.textContent = `Editar ${type === 'opening' ? 'Opening' : type === 'ending' ? 'Ending' : 'OST'}`;
+        
+        if (type === 'ost') {
+            // Mostrar campos relevantes para OST
+            document.getElementById('seasonField').style.display = 'none';
+            document.getElementById('ostYearField').style.display = 'block';
+            document.getElementById('ostTracksField').style.display = 'block';
+            
+            const ostKeys = Object.keys(anime.osts || {});
+            const ostKey = ostKeys[index];
+            const ostData = anime.osts[ostKey];
+            
+            musicTitle.value = ostKey;
+            musicArtist.value = '';
+            musicAudio.value = '';
+            musicCover.value = ostData.cover || '';
+            ostYear.value = ostData.year || '';
+            
+            // Carregar faixas
+            currentTracks = [...(ostData.tracks || [])];
+            updateTracksList();
+        } else {
+            // Mostrar campos relevantes para opening/ending
+            document.getElementById('seasonField').style.display = 'block';
+            document.getElementById('ostYearField').style.display = 'none';
+            document.getElementById('ostTracksField').style.display = 'none';
+            
+            const musicData = anime[type + 's'][index];
+            
+            musicTitle.value = musicData.title;
+            musicArtist.value = musicData.artist;
+            musicAudio.value = musicData.audio;
+            musicCover.value = musicData.cover || '';
+            musicSeason.value = musicData.season || 1;
+        }
+        
+        musicModal.style.display = 'block';
+    }
+    
+    function editTrack(index) {
+        const track = currentTracks[index];
+        trackIndex.value = index;
+        trackTitle.value = track.title;
+        trackArtist.value = track.artist || '';
+        trackAudio.value = track.audio;
+        trackDuration.value = track.duration;
+        trackModal.style.display = 'block';
+    }
+    
+    function deleteMusic(type, index) {
+        if (!confirm('Tem certeza que deseja remover este item?')) return;
+        
+        const anime = animeData[currentAnimeIndex];
+        
+        if (type === 'ost') {
+            const ostKeys = Object.keys(anime.osts || {});
+            const ostKey = ostKeys[index];
+            delete anime.osts[ostKey];
+        } else {
+            anime[type + 's'].splice(index, 1);
+        }
+        
+        updateMusicLists();
+        updateJsonOutput();
+    }
+    
     function updateDurationPreview(totalSeconds) {
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -699,19 +910,15 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCategoriesList();
         seasonSelect.innerHTML = '';
         episodeSelect.innerHTML = '';
+        openingsList.innerHTML = '';
+        endingsList.innerHTML = '';
+        ostsList.innerHTML = '';
         currentAnimeIndex = -1;
         currentSeasonIndex = -1;
         currentEpisodeIndex = -1;
         tempSeasons = null;
         durationPreview.textContent = '';
-        animeOpenings.value = '';
-        animeEndings.value = '';
-        animeOsts.value = '';
-
-        // Limpar listas de música
-        openingsList.innerHTML = '<p class="no-music">Nenhum opening adicionado</p>';
-        endingsList.innerHTML = '<p class="no-music">Nenhum ending adicionado</p>';
-        ostsList.innerHTML = '<p class="no-music">Nenhuma OST adicionada</p>';
+        
         // Remover destacados de erro
         document.querySelectorAll('input, textarea, select').forEach(el => {
             el.style.borderColor = '';
@@ -721,26 +928,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicialização
     resetForm();
     updateJsonOutput();
-});
-
-// Adicione este event listener para delegar eventos de edição/remoção
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('edit-music')) {
-        const type = e.target.dataset.type;
-        const index = parseInt(e.target.dataset.index);
-        openMusicModal(type, index);
-    }
-
-    if (e.target.classList.contains('remove-music')) {
-        if (confirm('Tem certeza que deseja remover esta música?')) {
-            const type = e.target.dataset.type;
-            const index = parseInt(e.target.dataset.index);
-            
-            if (currentAnimeIndex !== -1) {
-                animeData[currentAnimeIndex][type].splice(index, 1);
-                updateMusicLists();
-                updateJsonOutput();
-            }
-        }
-    }
 });
